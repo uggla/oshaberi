@@ -1,7 +1,8 @@
 # coding=utf-8
 
+import os
+import json
 import tkinter as tk
-from tkinter.constants import RIGHT
 
 class VerticalScrolledFrame(tk.Frame):
     """A pure Tkinter scrollable frame that actually works!
@@ -11,8 +12,7 @@ class VerticalScrolledFrame(tk.Frame):
     * This frame only allows vertical scrolling
     """
     def __init__(self, parent, *args, **kw):
-        tk.Frame.__init__(self, parent, *args, **kw)            
-
+        tk.Frame.__init__(self, parent, *args, **kw)                
         # create a canvas object and a vertical scrollbar for scrolling it
         vscrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         vscrollbar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
@@ -29,9 +29,9 @@ class VerticalScrolledFrame(tk.Frame):
         self.interior = interior = tk.Frame(canvas)
         interior_id = canvas.create_window(0, 0, window=interior,
                                            anchor=tk.NW)
-
+        
         # track changes to the canvas and frame width and sync them,
-        # also updating the scrollbar
+        # also updating the scrollbar        
         def _configure_interior(event):
             # update the scrollbars to match the size of the inner frame
             size = (interior.winfo_reqwidth(), interior.winfo_reqheight())
@@ -39,13 +39,14 @@ class VerticalScrolledFrame(tk.Frame):
             if interior.winfo_reqwidth() != canvas.winfo_width():
                 # update the canvas's width to fit the inner frame
                 canvas.config(width=interior.winfo_reqwidth())
-
+    
         interior.bind('<Configure>', _configure_interior)
 
         def _configure_canvas(event):
             if interior.winfo_reqwidth() != canvas.winfo_width():
                 # update the inner frame's width to fill the canvas
                 canvas.itemconfigure(interior_id, width=canvas.winfo_width())
+    
         canvas.bind('<Configure>', _configure_canvas)
 
 
@@ -61,11 +62,54 @@ class EditFrame(tk.Frame):
         self.sentence = tk.Text(edition)
         self.sentence.pack()
         #edit = tk.Button(edition, text='Edit').pack()
-        self.add = tk.Button(edition, text='Add', width=65).pack()
-        self.remove = tk.Button(edition, text='Remove', width=65).pack()
+        self.add_button = tk.Button(edition, text='Add', width=65)
+        self.add_button.pack()
+        self.remove_button = tk.Button(edition, text='Remove', width=65)
+        self.remove_button.pack()
 
 # Main
 if __name__ == "__main__":
+    # Functions
+    def read_sentences(json_file):
+        # read json file
+        with open(json_file) as json_data:
+            sentences = json.load(json_data)
+            json_data.close()
+        #print(sentences)    
+        return sentences
+    
+    def create_sentence_button(sentences):
+        for index, sentence in enumerate(sentences):
+            sentence_button = tk.Button(scframe.interior, height=1, width=60, 
+                #relief=tk.FLAT, 
+                #bg="gray99", fg="purple3",
+                font="Dosis", text=sentences[index],
+                command=lambda sentences_index=index,x=sentence: choose_sentence(sentences_index))
+            sentence_button.pack(padx=10, pady=5, side=tk.TOP)
+    
+    def add_sentences(event):
+        print("add sentences")
+        sentences.index(editframe.sentence.get(1.0, tk.END).rstrip())
+    
+    def remove_sentences(event):
+        print("remove sentences")
+        print(editframe.sentence.get(1.0, tk.END).rstrip())
+        sentences.remove(editframe.sentence.get(1.0, tk.END).rstrip())
+        scframe.interior.destroy()
+        create_sentence_button(sentences)
+        
+        
+    def choose_sentence(sentences_index):
+        print(sentences[sentences_index])
+        editframe.sentence.delete(1.0, tk.END)
+        editframe.sentence.insert(1.0, sentences[sentences_index])
+        print(editframe.sentence.get(1.0, tk.END).rstrip())
+        # Copy to clipboard
+        root.clipboard_clear()
+        root.clipboard_append(editframe.sentence.get(1.0, tk.END).rstrip())
+
+
+    # Gui definition
     root = tk.Tk()
     root.title("Taupie Wakfu fast chat")
     #root.configure(background="gray99")
@@ -73,29 +117,21 @@ if __name__ == "__main__":
     scframe = VerticalScrolledFrame(root)
     editframe = EditFrame(root)
     scframe.pack(side=tk.LEFT, expand="yes", fill="both")
-    editframe.pack(side=tk.RIGHT, expand="yes", fill="both")
+    editframe.pack(side=tk.RIGHT, expand="yes", fill="both")    
     
-    sentences = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ','titi']
-    for index, sentence in enumerate(sentences):
-        sentence_button = tk.Button(scframe.interior, height=1, width=60, 
-            #relief=tk.FLAT, 
-            #bg="gray99", fg="purple3",
-            font="Dosis", text='Button ' + sentences[index],
-            command=lambda sentences_index=index,x=sentence: choose_sentence(sentences_index))
-        sentence_button.pack(padx=10, pady=5, side=tk.TOP)
+    # Define handlers for the Add and Remove buttons
+    editframe.add_button.bind("<Button-1>", add_sentences)
+    editframe.remove_button.bind("<Button-1>", remove_sentences)
     
-    def choose_sentence(sentences_index):
-        print(sentences[sentences_index])
-        editframe.sentence.delete(1.0, tk.END)
-        editframe.sentence.insert(1.0, sentences[sentences_index])
-        print(editframe.sentence.get(1.0, tk.END))
-        # Copy to clipboard
-        root.clipboard_clear()
-        root.clipboard_append(editframe.sentence.get(1.0, tk.END))
+    
+    # Get sentences and create the buttons
+    sentences = read_sentences("taupie.json")
+    create_sentence_button(sentences)
     
     # Set minsize to avoid shrink windows
     root.update()
     root.geometry()
     root.minsize(root.winfo_width(), root.winfo_height())
     
+    # Run the Gui
     root.mainloop()
