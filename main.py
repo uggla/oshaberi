@@ -1,6 +1,5 @@
 # coding=utf-8
 
-import os
 import json
 import tkinter as tk
 
@@ -58,7 +57,7 @@ class EditFrame(tk.Frame):
         
         
         edition.pack(padx=10, pady=10, fill="both", expand="yes")
-        tk.Label(edition, text="A l'intérieure de la frame").pack()
+        #tk.Label(edition, text="A l'intérieure de la frame").pack()
         self.sentence = tk.Text(edition)
         self.sentence.pack()
         #edit = tk.Button(edition, text='Edit').pack()
@@ -78,7 +77,7 @@ if __name__ == "__main__":
         #print(sentences)    
         return sentences
     
-    def create_sentence_button(sentences):
+    def create_sentence_buttons(sentences):
         for index, sentence in enumerate(sentences):
             sentence_button = tk.Button(scframe.interior, height=1, width=60, 
                 #relief=tk.FLAT, 
@@ -89,15 +88,19 @@ if __name__ == "__main__":
     
     def add_sentences(event):
         print("add sentences")
-        sentences.index(editframe.sentence.get(1.0, tk.END).rstrip())
+        sentences.append(editframe.sentence.get(1.0, tk.END).rstrip())
+        refresh_sentence_buttons(sentences)
     
     def remove_sentences(event):
         print("remove sentences")
         print(editframe.sentence.get(1.0, tk.END).rstrip())
         sentences.remove(editframe.sentence.get(1.0, tk.END).rstrip())
-        scframe.interior.destroy()
-        create_sentence_button(sentences)
-        
+        refresh_sentence_buttons(sentences)
+    
+    def refresh_sentence_buttons(sentences):
+        for widget in scframe.interior.winfo_children():
+            widget.destroy()
+        create_sentence_buttons(sentences)
         
     def choose_sentence(sentences_index):
         print(sentences[sentences_index])
@@ -126,7 +129,7 @@ if __name__ == "__main__":
     
     # Get sentences and create the buttons
     sentences = read_sentences("taupie.json")
-    create_sentence_button(sentences)
+    create_sentence_buttons(sentences)
     
     # Set minsize to avoid shrink windows
     root.update()
