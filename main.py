@@ -58,10 +58,11 @@ class EditFrame(tk.Frame):
         
         edition.pack(padx=10, pady=10, fill="both", expand="yes")
         tk.Label(edition, text="A l'intérieure de la frame").pack()
-        sentence = tk.Text(edition).pack()
-        edit = tk.Button(edition, text='Edit').pack()
-        add = tk.Button(edition, text='Add').pack()
-        remove = tk.Button(edition, text='Remove').pack()
+        self.sentence = tk.Text(edition)
+        self.sentence.pack()
+        #edit = tk.Button(edition, text='Edit').pack()
+        self.add = tk.Button(edition, text='Add', width=65).pack()
+        self.remove = tk.Button(edition, text='Remove', width=65).pack()
 
 # Main
 if __name__ == "__main__":
@@ -74,15 +75,27 @@ if __name__ == "__main__":
     scframe.pack(side=tk.LEFT, expand="yes", fill="both")
     editframe.pack(side=tk.RIGHT, expand="yes", fill="both")
     
-    lis = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-    for i, x in enumerate(lis):
-        btn = tk.Button(scframe.interior, height=1, width=60, 
+    sentences = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ','titi']
+    for index, sentence in enumerate(sentences):
+        sentence_button = tk.Button(scframe.interior, height=1, width=60, 
             #relief=tk.FLAT, 
             #bg="gray99", fg="purple3",
-            font="Dosis", text='Button ' + lis[i],
-            command=lambda i=i,x=x: openlink(i))
-        btn.pack(padx=10, pady=5, side=tk.TOP)
+            font="Dosis", text='Button ' + sentences[index],
+            command=lambda sentences_index=index,x=sentence: choose_sentence(sentences_index))
+        sentence_button.pack(padx=10, pady=5, side=tk.TOP)
     
-    def openlink(i):
-        print(lis[i])
+    def choose_sentence(sentences_index):
+        print(sentences[sentences_index])
+        editframe.sentence.delete(1.0, tk.END)
+        editframe.sentence.insert(1.0, sentences[sentences_index])
+        print(editframe.sentence.get(1.0, tk.END))
+        # Copy to clipboard
+        root.clipboard_clear()
+        root.clipboard_append(editframe.sentence.get(1.0, tk.END))
+    
+    # Set minsize to avoid shrink windows
+    root.update()
+    root.geometry()
+    root.minsize(root.winfo_width(), root.winfo_height())
+    
     root.mainloop()
