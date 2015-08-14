@@ -66,6 +66,9 @@ class EditFrame(tk.Frame):
         self.remove_button = tk.Button(edition, text='Remove', width=65)
         self.remove_button.pack()
 
+
+
+
 # Main
 if __name__ == "__main__":
     # Functions
@@ -77,12 +80,20 @@ if __name__ == "__main__":
         #print(sentences)    
         return sentences
     
+    def write_sentences(data, json_file):
+        with open(json_file, 'w') as json_file_handler:
+            json.dump(data, json_file_handler)
+            json_file_handler.close()
+    
     def create_sentence_buttons(sentences):
         for index, sentence in enumerate(sentences):
-            sentence_button = tk.Button(scframe.interior, height=1, width=60, 
-                #relief=tk.FLAT, 
-                #bg="gray99", fg="purple3",
-                font="Dosis", text=sentences[index],
+            sentence_button = tk.Button(scframe.interior,
+                                        height=sentence.count("\n")+1,
+                                        width=60, 
+                                        #relief=tk.FLAT, 
+                                        #bg="gray99", fg="purple3",
+                                        font="Dosis",
+                                        text=sentences[index],
                 command=lambda sentences_index=index,x=sentence: choose_sentence(sentences_index))
             sentence_button.pack(padx=10, pady=5, side=tk.TOP)
     
@@ -111,12 +122,19 @@ if __name__ == "__main__":
         root.clipboard_clear()
         root.clipboard_append(editframe.sentence.get(1.0, tk.END).rstrip())
 
+    def on_closing():
+        write_sentences(sentences, "taupie.json")
+        root.destroy()
 
     # Gui definition
     root = tk.Tk()
     root.title("Taupie Wakfu fast chat")
     #root.configure(background="gray99")
+ 
+    # Define handler closing the main window
+    root.protocol("WM_DELETE_WINDOW", on_closing)
     
+    # Create the scrolling frame and the edit frame
     scframe = VerticalScrolledFrame(root)
     editframe = EditFrame(root)
     scframe.pack(side=tk.LEFT, expand="yes", fill="both")
@@ -125,8 +143,7 @@ if __name__ == "__main__":
     # Define handlers for the Add and Remove buttons
     editframe.add_button.bind("<Button-1>", add_sentences)
     editframe.remove_button.bind("<Button-1>", remove_sentences)
-    
-    
+     
     # Get sentences and create the buttons
     sentences = read_sentences("taupie.json")
     create_sentence_buttons(sentences)
@@ -135,6 +152,6 @@ if __name__ == "__main__":
     root.update()
     root.geometry()
     root.minsize(root.winfo_width(), root.winfo_height())
-    
+       
     # Run the Gui
     root.mainloop()
