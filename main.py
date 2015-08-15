@@ -87,7 +87,9 @@ if __name__ == "__main__":
     
     def create_sentence_buttons(sentences):
         for index, sentence in enumerate(sentences):
-            sentence_button = tk.Button(scframe.interior,
+            button_container_frame = tk.Frame(scframe.interior, padx=5)
+            button_container_frame.pack(side=tk.TOP)
+            sentence_button = tk.Button(button_container_frame,
                                         height=sentence.count("\n")+1,
                                         width=60, 
                                         #relief=tk.FLAT, 
@@ -95,7 +97,25 @@ if __name__ == "__main__":
                                         font="Dosis",
                                         text=sentences[index],
                 command=lambda sentences_index=index,x=sentence: choose_sentence(sentences_index))
-            sentence_button.pack(padx=10, pady=5, side=tk.TOP)
+            sentence_button.pack(padx=5, pady=5, side=tk.LEFT)
+            sentence_button_up = tk.Button(button_container_frame,
+                                        height=sentence.count("\n")+1,
+                                        width=1, 
+                                        #relief=tk.FLAT, 
+                                        #bg="gray99", fg="purple3",
+                                        font="Dosis",
+                                        text="+",
+                command=lambda sentences_index=index,x=sentence: choose_sentence_up(sentences_index))
+            sentence_button_up.pack(padx=5, pady=5, side=tk.LEFT)
+            sentence_button_down = tk.Button(button_container_frame,
+                                        height=sentence.count("\n")+1,
+                                        width=1, 
+                                        #relief=tk.FLAT, 
+                                        #bg="gray99", fg="purple3",
+                                        font="Dosis",
+                                        text="-",
+                command=lambda sentences_index=index,x=sentence: choose_sentence_down(sentences_index))
+            sentence_button_down.pack(padx=5, pady=5, side=tk.LEFT)
     
     def add_sentences(event):
         print("add sentences")
@@ -122,6 +142,27 @@ if __name__ == "__main__":
         root.clipboard_clear()
         root.clipboard_append(editframe.sentence.get(1.0, tk.END).rstrip())
 
+    def choose_sentence_up(sentence_index):
+        sentence = sentences[sentence_index]
+        sentence_length = len(sentences)
+        del sentences[sentence_index]
+        if sentence_index == 0:
+            sentences.insert(sentence_length - 1, sentence)
+        else:
+            sentences.insert(sentence_index - 1, sentence)
+        refresh_sentence_buttons(sentences)
+        
+    def choose_sentence_down(sentence_index):
+        sentence = sentences[sentence_index]
+        sentence_length = len(sentences)
+        del sentences[sentence_index]
+        if sentence_index == sentence_length -1:
+            sentences.insert(0, sentence)
+        else:
+            sentences.insert(sentence_index + 1, sentence)
+        refresh_sentence_buttons(sentences)
+
+        
     def on_closing():
         write_sentences(sentences, "taupie.json")
         root.destroy()
@@ -151,7 +192,7 @@ if __name__ == "__main__":
     # Set minsize to avoid shrink windows
     root.update()
     root.geometry()
-    root.minsize(root.winfo_width(), root.winfo_height())
+    root.minsize(root.winfo_width()+2, root.winfo_height()+2)
        
     # Run the Gui
     root.mainloop()
