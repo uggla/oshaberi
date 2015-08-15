@@ -118,15 +118,16 @@ if __name__ == "__main__":
             sentence_button_down.pack(padx=5, pady=5, side=tk.LEFT)
     
     def add_sentences(event):
-        print("add sentences")
-        sentences.append(editframe.sentence.get(1.0, tk.END).rstrip())
-        refresh_sentence_buttons(sentences)
+        if editframe.sentence.get(1.0, tk.END).rstrip() != "":
+            print('add sentences "{}"'.format(editframe.sentence.get(1.0, tk.END).rstrip()))
+            sentences.append(editframe.sentence.get(1.0, tk.END).rstrip())
+            refresh_sentence_buttons(sentences)
     
     def remove_sentences(event):
-        print("remove sentences")
-        print(editframe.sentence.get(1.0, tk.END).rstrip())
-        sentences.remove(editframe.sentence.get(1.0, tk.END).rstrip())
-        refresh_sentence_buttons(sentences)
+        if editframe.sentence.get(1.0, tk.END).rstrip() != "":
+            print('remove sentences "{}"'.format(editframe.sentence.get(1.0, tk.END).rstrip()))
+            sentences.remove(editframe.sentence.get(1.0, tk.END).rstrip())
+            refresh_sentence_buttons(sentences)
     
     def refresh_sentence_buttons(sentences):
         for widget in scframe.interior.winfo_children():
@@ -134,11 +135,11 @@ if __name__ == "__main__":
         create_sentence_buttons(sentences)
         
     def choose_sentence(sentences_index):
-        print(sentences[sentences_index])
+        print('sentence "{}" selected'.format(sentences[sentences_index]))
         editframe.sentence.delete(1.0, tk.END)
         editframe.sentence.insert(1.0, sentences[sentences_index])
-        print(editframe.sentence.get(1.0, tk.END).rstrip())
         # Copy to clipboard
+        print('sentence "{}" copied to clipboard'.format(editframe.sentence.get(1.0, tk.END).rstrip()))
         root.clipboard_clear()
         root.clipboard_append(editframe.sentence.get(1.0, tk.END).rstrip())
 
