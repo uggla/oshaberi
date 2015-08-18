@@ -85,46 +85,52 @@ if __name__ == "__main__":
         for index, sentence in enumerate(sentences):
             button_container_frame = tk.Frame(scframe.interior, padx=5)
             button_container_frame.pack(side=tk.TOP)
-            sentence_button = tk.Button(button_container_frame,
-                                        height=sentence.count("\n") + 1,
-                                        width=60,
-                                        # relief=tk.FLAT,
-                                        # bg="gray99", fg="purple3",
-                                        font="Dosis",
-                                        text=sentences[index],
-                                        command=lambda sentences_index=index,
-                                                       x=sentence: choose_sentence(sentences_index))
+            sentence_button = tk.Button(
+                button_container_frame,
+                height=sentence.count("\n") + 1,
+                width=60,
+                # relief=tk.FLAT,
+                # bg="gray99", fg="purple3",
+                font="Dosis",
+                text=sentences[index],
+                command=lambda sentences_index=index,
+                x=sentence: choose_sentence(sentences_index)
+            )
             sentence_button.pack(padx=5, pady=5, side=tk.LEFT)
-            sentence_button_up = tk.Button(button_container_frame,
-                                           height=sentence.count("\n") + 1,
-                                           width=1,
-                                           # relief=tk.FLAT,
-                                           # bg="gray99", fg="purple3",
-                                           font="Dosis",
-                                           text="+",
-                                           command=lambda sentences_index=index,
-                                                          x=sentence: choose_sentence_up(sentences_index))
+            sentence_button_up = tk.Button(
+                button_container_frame,
+                height=sentence.count("\n") + 1,
+                width=1,
+                # relief=tk.FLAT,
+                # bg="gray99", fg="purple3",
+                font="Dosis",
+                text="+",
+                command=lambda sentences_index=index,
+                x=sentence: choose_sentence_up(sentences_index))
             sentence_button_up.pack(padx=5, pady=5, side=tk.LEFT)
-            sentence_button_down = tk.Button(button_container_frame,
-                                             height=sentence.count("\n") + 1,
-                                             width=1,
-                                             # relief=tk.FLAT,
-                                             # bg="gray99", fg="purple3",
-                                             font="Dosis",
-                                             text="-",
-                                             command=lambda sentences_index=index,
-                                                            x=sentence: choose_sentence_down(sentences_index))
+            sentence_button_down = tk.Button(
+                button_container_frame,
+                height=sentence.count("\n") + 1,
+                width=1,
+                # relief=tk.FLAT,
+                # bg="gray99", fg="purple3",
+                font="Dosis",
+                text="-",
+                command=lambda sentences_index=index,
+                x=sentence: choose_sentence_down(sentences_index))
             sentence_button_down.pack(padx=5, pady=5, side=tk.LEFT)
 
     def add_sentences(event):
         if editframe.sentence.get(1.0, tk.END).rstrip() != "":
-            print('add sentences "{}"'.format(editframe.sentence.get(1.0, tk.END).rstrip()))
+            print('add sentences "{}"'.format(editframe.sentence.get(
+                1.0, tk.END).rstrip()))
             sentences.append(editframe.sentence.get(1.0, tk.END).rstrip())
             refresh_sentence_buttons(sentences)
 
     def remove_sentences(event):
         if editframe.sentence.get(1.0, tk.END).rstrip() != "":
-            print('remove sentences "{}"'.format(editframe.sentence.get(1.0, tk.END).rstrip()))
+            print('remove sentences "{}"'.format(editframe.sentence.get(
+                1.0, tk.END).rstrip()))
             sentences.remove(editframe.sentence.get(1.0, tk.END).rstrip())
             refresh_sentence_buttons(sentences)
 
@@ -138,7 +144,9 @@ if __name__ == "__main__":
         editframe.sentence.delete(1.0, tk.END)
         editframe.sentence.insert(1.0, sentences[sentences_index])
         # Copy to clipboard
-        print('sentence "{}" copied to clipboard'.format(editframe.sentence.get(1.0, tk.END).rstrip()))
+        print('sentence "{}" copied to clipboard'.format(
+            editframe.sentence.get(1.0, tk.END).rstrip()
+        ))
         root.clipboard_clear()
         root.clipboard_append(editframe.sentence.get(1.0, tk.END).rstrip())
 
