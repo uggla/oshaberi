@@ -1,5 +1,9 @@
 # coding=utf-8
 
+"""
+A small application in python tk
+"""
+
 import json
 import tkinter as tk
 
@@ -50,6 +54,7 @@ class VerticalScrolledFrame(tk.Frame):
 
 
 class EditFrame(tk.Frame):
+    """ The edition frame at the right """
     def __init__(self, parent, *args, **kw):
         tk.Frame.__init__(self, parent, *args, **kw)
         # tk.Label(self, text="Frame 1").pack(padx=10, pady=10)
@@ -65,10 +70,26 @@ class EditFrame(tk.Frame):
         self.remove_button.pack()
 
 
+class ChooseFrame(tk.Frame):
+    """ The of the left frame with the button Sentences, Smilies and About """
+    def __init__(self, parent, *args, **kw):
+        tk.Frame.__init__(self, parent, *args, **kw)
+        # tk.Label(self, text="Frame 1").pack(padx=10, pady=10)
+        choose = tk.LabelFrame(self, padx=10, pady=10)
+        choose.pack(padx=0, pady=0, fill="x", expand="yes")
+        # tk.Label(edition, text="A l'intérieure de la frame").pack()
+        self.sentences_button = tk.Button(choose, text='Sentences', width=25)
+        self.sentences_button.pack(side=tk.LEFT, padx=0)
+        self.smilies_button = tk.Button(choose, text='Smilies', width=25)
+        self.smilies_button.pack(side=tk.LEFT, padx=20)
+        self.about_button = tk.Button(choose, text='About', width=25)
+        self.about_button.pack(side=tk.LEFT, padx=0)
+
 # Main
 if __name__ == "__main__":
     # Functions
     def read_sentences(json_file):
+        """ Read a json file that contains the data """
         # read json file
         with open(json_file) as json_data:
             sentences = json.load(json_data)
@@ -77,11 +98,13 @@ if __name__ == "__main__":
         return sentences
 
     def write_sentences(data, json_file):
+        """ Write data to the json file """
         with open(json_file, 'w') as json_file_handler:
             json.dump(data, json_file_handler)
             json_file_handler.close()
 
     def create_sentence_buttons(sentences):
+        """ Create the buttons with the sentences """
         for index, sentence in enumerate(sentences):
             button_container_frame = tk.Frame(scframe.interior, padx=5)
             button_container_frame.pack(side=tk.TOP)
@@ -121,6 +144,7 @@ if __name__ == "__main__":
             sentence_button_down.pack(padx=5, pady=5, side=tk.LEFT)
 
     def add_sentences(event):
+        """ Add new sentences callback """
         if editframe.sentence.get(1.0, tk.END).rstrip() != "":
             print('add sentences "{}"'.format(editframe.sentence.get(
                 1.0, tk.END).rstrip()))
@@ -128,6 +152,7 @@ if __name__ == "__main__":
             refresh_sentence_buttons(sentences)
 
     def remove_sentences(event):
+        """ Remove sentences callback """
         if editframe.sentence.get(1.0, tk.END).rstrip() != "":
             print('remove sentences "{}"'.format(editframe.sentence.get(
                 1.0, tk.END).rstrip()))
@@ -135,11 +160,16 @@ if __name__ == "__main__":
             refresh_sentence_buttons(sentences)
 
     def refresh_sentence_buttons(sentences):
+        """ Clear and redraw the sentence buttons """
         for widget in scframe.interior.winfo_children():
             widget.destroy()
         create_sentence_buttons(sentences)
 
     def choose_sentence(sentences_index):
+        """
+        Update the edit field and copy to clipboard the
+        selected sentences
+        """
         print('sentence "{}" selected'.format(sentences[sentences_index]))
         editframe.sentence.delete(1.0, tk.END)
         editframe.sentence.insert(1.0, sentences[sentences_index])
@@ -151,6 +181,7 @@ if __name__ == "__main__":
         root.clipboard_append(editframe.sentence.get(1.0, tk.END).rstrip())
 
     def choose_sentence_up(sentence_index):
+        """ Callback allowing sentence button to go up """
         sentence = sentences[sentence_index]
         sentence_length = len(sentences)
         del sentences[sentence_index]
@@ -161,6 +192,7 @@ if __name__ == "__main__":
         refresh_sentence_buttons(sentences)
 
     def choose_sentence_down(sentence_index):
+        """ Callback allowing sentence button to go down """
         sentence = sentences[sentence_index]
         sentence_length = len(sentences)
         del sentences[sentence_index]
@@ -170,23 +202,45 @@ if __name__ == "__main__":
             sentences.insert(sentence_index + 1, sentence)
         refresh_sentence_buttons(sentences)
 
+    def load_sentences(event):
+        ''' Load the json file which contens sentences '''
+        pass
+
+    def load_smilies(event):
+        ''' Load the json file which contens smilies '''
+        pass
+
+    def about(event):
+        ''' About windows '''
+        pass
+
     def on_closing():
+        """ Callback on exiting the main window """
         write_sentences(sentences, "taupie.json")
         root.destroy()
 
     # Gui definition
     root = tk.Tk()
-    root.title("Taupie Wakfu fast chat")
+    root.title("Taupie fast chat")
     # root.configure(background="gray99")
 
     # Define handler closing the main window
     root.protocol("WM_DELETE_WINDOW", on_closing)
 
     # Create the scrolling frame and the edit frame
-    scframe = VerticalScrolledFrame(root)
+    leftframe = tk.LabelFrame(root)
+    scframe = VerticalScrolledFrame(leftframe)
+    chooseframe = ChooseFrame(leftframe)
     editframe = EditFrame(root)
-    scframe.pack(side=tk.LEFT, expand="yes", fill="both")
+    leftframe.pack(side=tk.LEFT, expand="yes", fill="both")
     editframe.pack(side=tk.RIGHT, expand="yes", fill="both")
+    chooseframe.pack(side=tk.TOP, fill="x")
+    scframe.pack(side=tk.TOP, expand="yes", fill="both")
+
+    # Define handlers for Sentences, Smilies and About buttons
+    chooseframe.sentences_button.bind("<Button-1>", load_sentences)
+    chooseframe.smilies_button.bind("<Button-1>", load_smilies)
+    chooseframe.about_button.bind("<Button-1>", about)
 
     # Define handlers for the Add and Remove buttons
     editframe.add_button.bind("<Button-1>", add_sentences)
