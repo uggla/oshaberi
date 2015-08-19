@@ -212,7 +212,15 @@ if __name__ == "__main__":
 
     def about(event):
         ''' About windows '''
-        pass
+        global bob
+        about = tk.Toplevel()
+        about.title("About")
+        bob = tk.PhotoImage(file="bob.png")
+        #canvas = tk.Canvas(about, width=320, height=261)
+        #canvas.create_image(0, 0, anchor=tk.NW, image=bob)
+        #canvas.pack()
+        button = tk.Button(about, image=bob)
+        button.pack()
 
     def on_closing():
         """ Callback on exiting the main window """
