@@ -78,9 +78,17 @@ class ChooseFrame(tk.Frame):
         choose = tk.LabelFrame(self, padx=10, pady=10)
         choose.pack(padx=0, pady=0, fill="x", expand="yes")
         # tk.Label(edition, text="A l'intérieure de la frame").pack()
-        self.sentences_button = tk.Button(choose, text='Sentences', width=25)
+        self.sentences_button = tk.Button(choose,
+                                          text='Sentences',
+                                          relief=tk.SUNKEN,
+                                          state='disabled',
+                                          width=25)
         self.sentences_button.pack(side=tk.LEFT, padx=0)
-        self.smilies_button = tk.Button(choose, text='Smilies', width=25)
+        self.smilies_button = tk.Button(choose,
+                                        text='Smilies',
+                                        relief=tk.RAISED,
+                                        # state='disabled',
+                                        width=25)
         self.smilies_button.pack(side=tk.LEFT, padx=20)
         self.about_button = tk.Button(choose, text='About', width=25)
         self.about_button.pack(side=tk.LEFT, padx=0)
@@ -204,32 +212,48 @@ if __name__ == "__main__":
 
     def load_sentences(event):
         ''' Load the json file which contens sentences '''
-        pass
+        global json_data_file
+        global sentences
+        write_sentences(sentences, json_data_file)
+        json_data_file = "sentences.json"
+        chooseframe.sentences_button.config(state='disable')
+        chooseframe.sentences_button.config(relief=tk.SUNKEN)
+        chooseframe.smilies_button.config(state='normal')
+        chooseframe.smilies_button.config(relief=tk.RAISED)
+        sentences = read_sentences(json_data_file)
+        refresh_sentence_buttons(sentences)
 
     def load_smilies(event):
         ''' Load the json file which contens smilies '''
-        pass
+        global json_data_file
+        global sentences
+        write_sentences(sentences, json_data_file)
+        json_data_file = "smilies.json"
+        chooseframe.smilies_button.config(state='disable')
+        chooseframe.smilies_button.config(relief=tk.SUNKEN)
+        chooseframe.sentences_button.config(state='normal')
+        chooseframe.sentences_button.config(relief=tk.RAISED)
+        sentences = read_sentences(json_data_file)
+        refresh_sentence_buttons(sentences)
 
     def about(event):
         ''' About windows '''
         global bob
         about = tk.Toplevel()
         about.title("About")
-        bob = tk.PhotoImage(file="bob.png")
-        #canvas = tk.Canvas(about, width=320, height=261)
-        #canvas.create_image(0, 0, anchor=tk.NW, image=bob)
-        #canvas.pack()
-        button = tk.Button(about, image=bob)
-        button.pack()
+        bob = tk.PhotoImage(file="images/bob.png")
+        canvas = tk.Canvas(about, width=320, height=261)
+        canvas.create_image(0, 0, anchor=tk.NW, image=bob)
+        canvas.pack()
 
     def on_closing():
         """ Callback on exiting the main window """
-        write_sentences(sentences, "taupie.json")
+        write_sentences(sentences, json_data_file)
         root.destroy()
 
     # Gui definition
     root = tk.Tk()
-    root.title("Taupie fast chat")
+    root.title("Oshaberi")
     # root.configure(background="gray99")
 
     # Define handler closing the main window
@@ -255,7 +279,8 @@ if __name__ == "__main__":
     editframe.remove_button.bind("<Button-1>", remove_sentences)
 
     # Get sentences and create the buttons
-    sentences = read_sentences("taupie.json")
+    json_data_file = "sentences.json"
+    sentences = read_sentences(json_data_file)
     create_sentence_buttons(sentences)
 
     # Set minsize to avoid shrink windows
